@@ -1,0 +1,13 @@
+pandas
+openpyxl
+langgraph
+langchain-core
+langchain-google-genai
+python-dotenv
+apscheduler
+anthropic
+jinja2
+matplotlib
+pytest
+langsmith
+langgraph-cli[inmem]

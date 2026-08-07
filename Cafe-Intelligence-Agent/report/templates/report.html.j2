@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ cafe_name_en }} — Weekly Report {{ week_id }}</title>
+<style>
+  :root { --coffee: #6F4E37; --accent: #C08552; --bg: #FBF7F2; --ink: #2B2118; --muted: #8a7a6a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Segoe UI', Tahoma, Arial, sans-serif; line-height: 1.5; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 20px; }
+
+  header { background: var(--coffee); color: white; padding: 22px 24px; border-radius: 12px; margin-bottom: 20px; }
+  header h1 { margin: 0 0 4px 0; font-size: 21px; }
+  header .sub { opacity: 0.85; font-size: 13px; }
+
+  .lang-block { background: white; border-radius: 12px; padding: 22px 24px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .lang-block[dir="rtl"] { font-family: 'Segoe UI', Tahoma, 'Noto Naskh Arabic', Arial, sans-serif; }
+
+  h2 { color: var(--coffee); font-size: 17px; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
+  h3.section-label { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;
+                      margin: 22px 0 8px 0; padding-bottom: 4px; border-bottom: 1px solid #eee2d3; }
+  h3.section-label:first-child { margin-top: 0; }
+
+  /* At-a-glance highlight strip — the 4 numbers an owner reads in 5 seconds */
+  .highlights { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .highlight-chip { flex: 1; min-width: 130px; background: #FBF3E9; border: 1px solid #f0e2cc; border-radius: 10px;
+                     padding: 10px 12px; }
+  .highlight-chip .num { font-size: 20px; font-weight: 700; color: var(--coffee); }
+  .highlight-chip .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .agent-group { margin-bottom: 4px; }
+  .finding { border-left: 3px solid var(--accent); padding: 8px 12px; margin: 6px 0; background: #FDFBF9; border-radius: 6px; }
+  .finding[dir="rtl"] { border-left: none; border-right: 3px solid var(--accent); }
+  .finding .claim { font-size: 14px; }
+  .finding .claim .num { font-weight: 700; color: var(--coffee); }
+  .finding .evidence { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  img.chart { max-width: 100%; border-radius: 6px; margin: 6px 0 2px 0; }
+
+  .idea { border: 1px solid #e8ded2; border-radius: 10px; padding: 14px 16px; margin: 10px 0; }
+  .idea .fmt-badge { display: inline-block; background: var(--accent); color: white; font-size: 11px; padding: 2px 9px; border-radius: 10px; margin-bottom: 6px; }
+  .idea .hook { font-weight: 600; font-size: 15px; margin: 4px 0; }
+  .idea .rationale { font-size: 13px; color: #55483a; margin: 4px 0; }
+  .idea .when { font-size: 12px; color: var(--coffee); margin-top: 6px; }
+  .idea .meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  .trust-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #3f7d43;
+                 background: #eef7ef; border-radius: 20px; padding: 5px 12px; margin-bottom: 14px; }
+  .trust-badge.warn { color: #8a3b34; background: #fce8e6; }
+
+  .op-item { border-left: 3px solid #cbb8f2; padding: 8px 12px; margin: 6px 0; background: #FBFAFD; border-radius: 6px; }
+  .op-item[dir="rtl"] { border-left: none; border-right: 3px solid #cbb8f2; }
+  .op-item .headline { font-size: 14px; }
+  .op-item .meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .quadrant-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 0.03em; padding: 1px 8px;
+                  border-radius: 8px; background: #eee2d3; color: var(--coffee); margin-inline-start: 6px; }
+
+  details.tech-log { margin-top: 8px; }
+  details.tech-log summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 6px 0; }
+  details.tech-log .tech-line { font-size: 11px; color: var(--muted); background: #f5eee5; padding: 5px 10px;
+                                 border-radius: 4px; margin: 3px 0; }
+
+  footer { text-align: center; font-size: 11px; color: #a89a89; margin: 20px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>{{ cafe_name_en }} — {{ cafe_name_ar }}</h1>
+    <div class="sub">Week {{ week_id }} | {{ generated_at }}</div>
+  </header>
+
+  {% for lang, dir in [("en", "ltr"), ("ar", "rtl")] %}
+  <div class="lang-block" dir="{{ dir }}">
+
+    {# ---------- at-a-glance strip ---------- #}
+    <h2>{{ "This week at a glance" if lang == "en" else "لمحة سريعة عن الأسبوع" }}</h2>
+    <div class="highlights">
+      {% for f in highlights %}
+        <div class="highlight-chip">
+          <div class="num">{% if f.number is number %}{{ "%.1f"|format(f.number) }}{% else %}{{ f.number }}{% endif %}</div>
+          <div class="lbl">{{ (f.claim if lang == "en" else f.claim_ar) | truncate(46) }}</div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if critic_feedback %}
+      <div class="trust-badge {{ 'warn' if rejection_log else '' }}">
+        {% if rejection_log %}
+          ⚠️ {{ rejection_log | length }} {{ "claim(s) rejected before reaching this report" if lang == "en" else "ادعاء تم رفضه قبل وصوله للتقرير" }}
+        {% else %}
+          ✓ {{ "Every number below was verified by the critic — " if lang == "en" else "تم التحقق من جميع الأرقام أدناه — " }}{{ total_findings }} {{ "findings, 0 rejected" if lang == "en" else "نتيجة، 0 مرفوضة" }}
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {# ---------- findings, grouped by analyst instead of one flat list ---------- #}
+    {% for group in finding_groups %}
+      <h3 class="section-label">{{ group.icon }} {{ group.label_en if lang == "en" else group.label_ar }}</h3>
+      <div class="agent-group">
+        {% for f in group.findings %}
+          <div class="finding" dir="{{ dir }}">
+            <div class="claim">{{ f.claim if lang == "en" else f.claim_ar }}{% if lang == "en" and f.number is not none %} — <span class="num">{% if f.number is number %}{{ "%.1f"|format(f.number) }}{% else %}{{ f.number }}{% endif %}</span>{% endif %}</div>
+            <div class="evidence">{{ f.evidence }}</div>
+            {% if f._idx|string in charts %}
+              <img class="chart" src="data:image/png;base64,{{ charts[f._idx|string][lang] }}">
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+
+    {% if "_overview_top_products" in charts %}
+      <h3 class="section-label">{{ "Top products (6 months)" if lang == "en" else "أفضل المنتجات (٦ أشهر)" }}</h3>
+      <img class="chart" src="data:image/png;base64,{{ charts['_overview_top_products'][lang] }}">
+    {% endif %}
+
+    {# ---------- content ideas ---------- #}
+    <h3 class="section-label">🎬 {{ "Content ideas for this week" if lang == "en" else "أفكار المحتوى لهذا الأسبوع" }}</h3>
+    {% for idea in content_ideas %}
+      <div class="idea">
+        <span class="fmt-badge">{{ idea.format }}</span>
+        <div class="hook">{{ idea.hook_en if lang == "en" else idea.hook_ar }}</div>
+        {% if idea.product_name_en %}
+          <div class="meta">{{ "Featured product: " if lang == "en" else "المنتج المُروَّج له: " }}
+            {{ idea.product_name_en if lang == "en" else idea.product_name_ar }}</div>
+        {% endif %}
+        <div class="rationale">{{ idea.rationale_en if lang == "en" else idea.rationale_ar }}</div>
+        <div class="when">
+          {{ "Best time to post: " if lang == "en" else "أفضل وقت للنشر: " }}{{ idea.best_day }} {{ idea.best_time }}
+        </div>
+        <div class="meta">{{ idea.posting_grounding }}</div>
+        <div class="meta">{{ "Local context: " if lang == "en" else "السياق المحلي: " }}{{ idea.local_context_used }}</div>
+        {% if idea.memory_note %}<div class="meta">🧠 {{ idea.memory_note }}</div>{% endif %}
+      </div>
+    {% endfor %}
+
+    {# ---------- waste-to-riyals ---------- #}
+    {% if waste_lines %}
+    <h3 class="section-label">🗑️ {{ "Waste-to-Riyals" if lang == "en" else "الهدر بالريال" }}</h3>
+    <div class="op-item" dir="{{ dir }}">
+      <div class="headline">
+        {{ "Total waste: SAR " if lang == "en" else "إجمالي الهدر: " }}{{ "%.0f"|format(waste_total_monthly) }}{{ "/month" if lang == "en" else " ريال/شهر" }}
+        — {{ "SAR " if lang == "en" else "" }}{{ "%.0f"|format(waste_projected_savings) }}{{ " SAR" if lang == "ar" else "" }}{{ "/month recoverable" if lang == "en" else " ريال/شهر قابلة للتوفير" }}
+      </div>
+    </div>
+    {% for w in waste_lines[:5] %}
+      <div class="op-item" dir="{{ dir }}">
+        <div class="headline">{{ w.item }} — {{ "SAR " if lang == "en" else "" }}{{ "%.0f"|format(w.monthly_waste_cost_sar) }}{{ " ريال" if lang == "ar" else "" }}{{ "/mo" if lang == "en" else "/شهر" }}</div>
+        <div class="meta">{{ "Ordering " if lang == "en" else "الطلب حاليًا " }}{{ w.avg_weekly_ordered }}{{ "/wk → recommend " if lang == "en" else "/أسبوع ← المقترح " }}{{ w.recommended_weekly_order }}{{ "/wk" if lang == "en" else "/أسبوع" }}</div>
+      </div>
+    {% endfor %}
+    {% endif %}
+
+    {# ---------- menu engineering ---------- #}
+    {% if menu_matrix %}
+    <h3 class="section-label">📋 {{ "Menu Engineering — cut candidates" if lang == "en" else "هندسة المنيو — مرشحون للإلغاء" }}</h3>
+    {% for e in menu_matrix if e.quadrant == "dog" %}
+      <div class="op-item" dir="{{ dir }}">
+        <div class="headline">{{ e.item_en if lang == "en" else e.item_ar }}
+          <span class="quadrant-tag">{{ e.quadrant if lang == "en" else e.quadrant_ar }}</span></div>
+        <div class="meta">{{ e.recommendation_en if lang == "en" else e.recommendation_ar }}</div>
+      </div>
+    {% endfor %}
+    {% endif %}
+
+    {# ---------- technical log — collapsed, developer-facing, never mixed with findings ---------- #}
+    {% if data_quality_log %}
+    <details class="tech-log">
+      <summary>{{ "🔧 Technical data-cleaning log (for the dev team)" if lang == "en" else "🔧 سجل تنظيف البيانات التقني (لفريق التطوير)" }}</summary>
+      {% for line in data_quality_log %}
+        <div class="tech-line">{{ line }}</div>
+      {% endfor %}
+      <div class="tech-line">{{ "Critic: " if lang == "en" else "المراجع: " }}{{ critic_feedback }} · {{ "revisions used: " if lang == "en" else "جولات المراجعة: " }}{{ revision_count }}</div>
+    </details>
+    {% endif %}
+
+  </div>
+  {% endfor %}
+
+  <footer>Generated automatically — {{ generated_at }} — week {{ week_id }}</footer>
+</div>
+</body>
+</html>

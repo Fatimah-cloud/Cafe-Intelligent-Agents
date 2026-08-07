@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "cafe_intelligence_agent": "./full_graph.py:full_graph_for_studio"
+  },
+  "env": ".env"
+}

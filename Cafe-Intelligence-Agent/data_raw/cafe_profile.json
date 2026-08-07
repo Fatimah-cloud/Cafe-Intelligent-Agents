@@ -1,0 +1,27 @@
+{
+ "cafe_name": "Qahwa Saihat",
+ "cafe_name_ar": "قهوة سيهات",
+ "city": "Saihat",
+ "governorate": "Qatif",
+ "region": "Eastern Province",
+ "country": "Saudi Arabia",
+ "coordinates": {
+  "lat": 26.465,
+  "lng": 50.04
+ },
+ "timezone": "Asia/Riyadh",
+ "seats": 42,
+ "opened": "2025-02-01",
+ "opening_hours": {
+  "default": "07:00-23:00",
+  "ramadan": "14:00-01:00"
+ },
+ "instagram": "@qahwa.saihat",
+ "tiktok": "@qahwa.saihat",
+ "currency": "SAR",
+ "weekend_days": [
+  "Friday",
+  "Saturday"
+ ],
+ "notes": "Neighbourhood specialty cafe. Mixed student and family traffic. Arabic-first audience."
+}

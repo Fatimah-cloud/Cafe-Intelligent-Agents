@@ -1,0 +1,49 @@
+{
+  "_comment": "Source registry for ingestion. Onboarding a new cafe = point 'data_dir' at new files here. No code changes.",
+  "data_dir": "data_raw",
+  "sources": [
+    {
+      "name": "pos_transactions",
+      "parser": "csv",
+      "file": "pos_transactions.csv",
+      "required": true
+    },
+    {
+      "name": "menu_items",
+      "parser": "csv",
+      "file": "menu_items.csv",
+      "required": true
+    },
+    {
+      "name": "foot_traffic",
+      "parser": "csv",
+      "file": "foot_traffic.csv",
+      "required": true
+    },
+    {
+      "name": "staff_shifts",
+      "parser": "csv",
+      "file": "staff_shifts.csv",
+      "required": true
+    },
+    {
+      "name": "inventory_weekly",
+      "parser": "excel",
+      "file": "inventory_weekly.xlsx",
+      "sheet": "weekly_counts",
+      "required": true
+    },
+    {
+      "name": "supplier_emails",
+      "parser": "email",
+      "file": "supplier_emails",
+      "required": false
+    },
+    {
+      "name": "customer_reviews",
+      "parser": "json",
+      "file": "customer_reviews.json",
+      "required": true
+    }
+  ]
+}
