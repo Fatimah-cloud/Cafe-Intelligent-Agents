@@ -1,4 +1,4 @@
-# Cafe Intelligence Agent — Qahwa Saihat
+# Cafe Intelligence Agent - Qahwa Saihat
 
 A weekly, autonomous, multi-agent system that reads a cafe's raw data across
 six sources, cleans it, runs five parallel analysts with a critic gatekeeping
@@ -8,7 +8,7 @@ WhatsApp summary and full HTML report pausing for the owner's approval
 before anything goes out, and remembering every week that came before.
 
 
-## Run it — one command
+# Run it - one command
 
 ```bash
 git clone <this repo>
